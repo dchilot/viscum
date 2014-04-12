@@ -551,7 +551,7 @@ def parse_help(input):
 def get_help(program, help_command):
     import sh
     run = sh.Command(program)
-    return str(run(help_command))
+    return str(run(help_command.split(' '), _ok_code=list(range(0, 255))))
 
 
 class JsonForm(object):
@@ -605,12 +605,18 @@ class JsonForm(object):
         return dico
 
 
-def dump_json(help_text):
+def dump_json(help_text, pretty=False):
     json_form = JsonForm()
     content = []
     for item in parse_help(help_text):
         item.build(json_form, content)
-    return json.dumps(content)
+    if (pretty):
+        return json.dumps(
+            content,
+            sort_keys=True,
+            indent=4, separators=(',', ': '))
+    else:
+        return json.dumps(content)
 
 
 def main(argv):
@@ -624,6 +630,11 @@ def main(argv):
         default=False,
         action='store_true')
     parser.add_argument(
+        "--pretty-json",
+        help="Try to make json output pretty.",
+        default=False,
+        action='store_true')
+    parser.add_argument(
         "-c", "--help-command",
         help="What needs to be given to make the program display help.",
         default="--help")
@@ -632,7 +643,7 @@ def main(argv):
     help_text = get_help(arguments.program, arguments.help_command)
     #print(help_text)
     if (arguments.json):
-        print(dump_json(help_text))
+        print(dump_json(help_text, arguments.pretty_json))
     else:
         for item in parse_help(help_text):
             print(item)

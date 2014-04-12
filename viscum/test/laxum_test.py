@@ -965,6 +965,103 @@ usage: git checkout [options] <branch>
             '"name": "-p, --patch", "value": "bug"}, '
             '{"control": "break"}]')
         assert_equal(expected_json, json.loads(dump))
+        expected_pretty_json = """\
+[
+    {
+        "control": "textbox",
+        "name": "checkout"
+    },
+    {
+        "content": "branch>\\n"""\
+"""   or: git checkout [options] [<branch>] -- <file>...\\n",
+        "control": "text"
+    },
+    {
+        "control": "break"
+    },
+    {
+        "checked": false,
+        "control": "checkbox",
+        "name": "-q, --quiet",
+        "value": "bug"
+    },
+    {
+        "control": "textarea",
+        "name": "-b"
+    },
+    {
+        "control": "textarea",
+        "name": "-B"
+    },
+    {
+        "checked": false,
+        "control": "checkbox",
+        "name": "-l",
+        "value": "bug"
+    },
+    {
+        "checked": false,
+        "control": "checkbox",
+        "name": "--detach",
+        "value": "bug"
+    },
+    {
+        "checked": false,
+        "control": "checkbox",
+        "name": "-t, --track",
+        "value": "bug"
+    },
+    {
+        "control": "textarea",
+        "name": "--orphan"
+    },
+    {
+        "checked": false,
+        "control": "checkbox",
+        "name": "-2, --ours",
+        "value": "bug"
+    },
+    {
+        "checked": false,
+        "control": "checkbox",
+        "name": "-3, --theirs",
+        "value": "bug"
+    },
+    {
+        "checked": false,
+        "control": "checkbox",
+        "name": "-f, --force",
+        "value": "bug"
+    },
+    {
+        "checked": false,
+        "control": "checkbox",
+        "name": "-m, --merge",
+        "value": "bug"
+    },
+    {
+        "checked": false,
+        "control": "checkbox",
+        "name": "--overwrite-ignore",
+        "value": "bug"
+    },
+    {
+        "control": "textarea",
+        "name": "--conflict"
+    },
+    {
+        "checked": false,
+        "control": "checkbox",
+        "name": "-p, --patch",
+        "value": "bug"
+    },
+    {
+        "control": "break"
+    }
+]"""
+        assert_equal(
+            expected_pretty_json,
+            wrapper.dump_json(git_checkout_help, True))
 
  #ipdb debugging
 
