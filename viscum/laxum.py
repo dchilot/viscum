@@ -40,6 +40,7 @@ gAnything = Regex(".*").suppress()
 gSpace = Literal(" ")
 gSpaces = ZeroOrMore(gSpace).suppress()
 gEOL = Regex("\n").suppress()
+gEOL_keep = Regex("\n")
 gImportantSpaces = ZeroOrMore(gSpace)
 gInnerArgument = Word(alphas, alphanums + '_-').setResultsName("argument")
 gArgument = gSpace + gInnerArgument
@@ -89,11 +90,11 @@ gUsage = Group(Or([
     gSpace + gName + gSpaces + gParameters).setResultsName("usage")
 gEmptyLine = gSpaces + gEOL
 gShortText = Optional(
-    Word(srange("[A-Z]") + srange("[a-z]")) + restOfLine) + gEOL
-gText = OneOrMore(gShortText)
-gIntroduction = Optional(
-    Group(Word(srange("[A-Z]") + srange("[a-z]")) + Regex(".*:$"))
-    .setResultsName("introduction"))
+    Word(srange("[A-Z]") + srange("[a-z]")) + restOfLine) + gEOL_keep
+#gText = OneOrMore(gShortText)
+#gIntroduction = Optional(
+    #Group(Word(srange("[A-Z]") + srange("[a-z]")) + Regex(".*:$"))
+    #.setResultsName("introduction"))
 gOptionDescriptionText = \
     Optional(gRepetition + Literal(':')) + \
     OneOrMore(
@@ -113,9 +114,9 @@ gOptionDescriptionSwitch = Or([
     gStdin])
 gOptionDescription = (gOptionDescriptionSwitch + gOptionDescriptionText)\
     .setResultsName("option_description")
-gBidule = gIntroduction + gOptionDescription
-gSubNext = Or([gBidule, gShortText.setResultsName("short_text")])
-gNext = Dict(ZeroOrMore(Group(gSubNext))).setResultsName("next")
+#gBidule = gIntroduction + gOptionDescription
+#gSubNext = Or([gBidule, gShortText.setResultsName("short_text")])
+#gNext = Dict(ZeroOrMore(Group(gSubNext))).setResultsName("next")
 gRest = Regex("(.*\n?)*").setResultsName("rest")
 gHelp = Optional(gEmptyLine) + gUsage + gRest
 
@@ -131,6 +132,8 @@ class Stdin(object):
 class Option(object):
     def __init__(self, parsed_option):
         self._raw = parsed_option
+        #print('Option')
+        #print('\tself._raw = ' + self._raw)
         self._names = ["".join(parsed_option.first_option)]
         parameters = []
         #if ("other_options" in parsed_option.keys()):
@@ -158,7 +161,7 @@ class Option(object):
             self._description = "".join("".join(parsed_option.description))
             self._description = self._description.replace("\n", " ")
             self._description = self._description.lstrip(" ")
-            #print "self._description = '" + self._description + "'"
+            #print("\tself._description = '" + self._description + "'")
         else:
             self._description = None
 
@@ -349,7 +352,8 @@ class OptionGroup(object):
     def __str__(self):
         result = ""
         if (self.introduction is not None):
-            result += self.introduction + "\n"
+            #result += self.introduction + "\n"
+            result += self.introduction
         for option in self._options:
             result += str(option) + "\n"
         return result
@@ -373,7 +377,7 @@ class SplitFeeder(object):
             finish_index = self._string.find(self._splitter, self._position)
             if (-1 != finish_index):
                 self._position = finish_index + 1
-                yield self._string[start_index:finish_index]
+                yield self._string[start_index:self._position]
             else:
                 self._position = None
                 yield self._string[start_index:]
@@ -385,7 +389,7 @@ class SplitFeeder(object):
             finish_index = self._string.find(self._splitter, self._position)
             if (-1 != finish_index):
                 self._position = finish_index + 1
-                return self._string[start_index:finish_index]
+                return self._string[start_index:self._position]
             else:
                 self._position = None
                 return self._string[start_index:]
@@ -421,23 +425,25 @@ def is_option_start(line):
     if (line is None):
         return False
     else:
+        line = line.strip('\n')
         return ((RE_IS_NOT_OPTION_START.match(line) is None) and
                 ((RE_IS_OPTION_START.match(line) is not None) or
                     (RE_IS_PSEUDO_OPTION_START.match(line) is not None)))
 
 
 def parse_text(text, feeder, items):
+    #print('parse_text')
     eot = False
     current_line = text
     text = ""
     while (not eot):
-        #print "current_line = '" + str(current_line) + "'"
+        #print("current_line = '" + str(current_line) + "'")
         if (current_line is None):
-            #print "None"
+            #print("None")
             items.append(Text(text))
             eot = True
-        elif (0 == len(current_line)):
-            #print "-Empty-"
+        elif ('\n' == current_line):
+            #print("-Empty-")
             if (0 != len(text)):
                 items.append(Text(text))
             items.append(EmptyLine())
@@ -445,15 +451,16 @@ def parse_text(text, feeder, items):
             parse_start(current_line, feeder, items)
             eot = True
         elif (is_option_start(current_line)):
+            #print("option")
             if (0 != len(text)):
                 items.append(Text(text))
             og = OptionGroup()
             parse_option(current_line, feeder, items, og)
             eot = True
-        elif (current_line.endswith(":")):
-            #print "...:"
-            if ((0 != len(text)) and (not text.endswith(" "))):
-                text += " "
+        elif (current_line.endswith(":\n")):
+            #print("...:")
+            #if ((0 != len(text)) and (not text.endswith(" "))):
+                #text += " "
             text += current_line
             current_line = feeder.next()
             if (is_option_start(current_line)):
@@ -462,14 +469,15 @@ def parse_text(text, feeder, items):
                 parse_option(current_line, feeder, items, og)
                 eot = True
         else:
-            #print "something else"
-            if ((0 != len(text)) and (not text.endswith(" "))):
-                text += " "
+            #print("something else")
+            #if ((0 != len(text)) and (not text.endswith(" "))):
+                #text += " "
             text += current_line
             current_line = feeder.next()
 
 
 def parse_option(option_text, feeder, items, option_group):
+    #print('parse_option')
     can_parse = False
     finished = False
     is_empty = False
@@ -490,10 +498,12 @@ def parse_option(option_text, feeder, items, option_group):
                     finished = True
                     is_empty = True
                     can_parse = True
+                #else:
+                    #option_text += "\n" + current_line
                 else:
-                    option_text += "\n" + current_line
-    #print "option_text"
-    #print option_text
+                    option_text += current_line
+    #print("option_text")
+    #print(option_text)
     parsed_option = gOptionDescription.leaveWhitespace().\
         parseWithTabs().parseString(option_text)
     option_group.add_option(Option(parsed_option))
@@ -506,6 +516,7 @@ def parse_option(option_text, feeder, items, option_group):
 
 
 def parse_start(current_line, feeder, items):
+    #print('parse_start')
     if (current_line is not None):
         if (is_option_start(current_line)):
             parse_option(current_line, feeder, items, OptionGroup())

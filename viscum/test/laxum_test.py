@@ -8,7 +8,7 @@ import viscum.laxum as wrapper
 class SplitFeeder(unittest.TestCase):
     def test_1(self):
         sf = wrapper.SplitFeeder("""This is a sample string.""", " ")
-        expected = ["This", "is", "a", "sample", "string.", None]
+        expected = ["This ", "is ", "a ", "sample ", "string.", None]
         found = False
         while (found is not None):
             found = sf.next()
@@ -25,21 +25,21 @@ class SplitFeeder(unittest.TestCase):
 
     def test_4(self):
         sf = wrapper.SplitFeeder("endswithaspace ", " ")
-        assert_equal(sf.next(), "endswithaspace")
+        assert_equal(sf.next(), "endswithaspace ")
         assert_equal(sf.next(), None)
 
     def test_5(self):
         sf = wrapper.SplitFeeder("1 2 3", " ")
-        assert_equal(sf.next(), "1")
-        assert_equal(sf.next(), "2")
+        assert_equal(sf.next(), "1 ")
+        assert_equal(sf.next(), "2 ")
         sf.reset()
-        assert_equal(sf.next(), "1")
-        assert_equal(sf.next(), "2")
+        assert_equal(sf.next(), "1 ")
+        assert_equal(sf.next(), "2 ")
         assert_equal(sf.next(), "3")
         assert_equal(sf.next(), None)
         assert_equal(sf.next(), None)
         sf.reset()
-        assert_equal(sf.next(), "1")
+        assert_equal(sf.next(), "1 ")
 
 
 class IsOptionStart(unittest.TestCase):
@@ -99,7 +99,7 @@ On more than one line. It is important: there is a trap !""")
         wrapper.parse_text(current_line, sf, items)
         assert_equal(1, len(items))
         assert_equal(
-            "This is some text. On more than one line."
+            "This is some text.\nOn more than one line."
             " It is important: there is a trap !", str(items[0]))
 
     def test_2(self):
@@ -109,7 +109,7 @@ On more than one line. It is important: there is a trap !""")
         current_line = sf.next()
         wrapper.parse_text(current_line, sf, items)
         assert_equal(1, len(items))
-        assert_equal("Single line.", str(items[0]))
+        assert_equal("Single line.\n", str(items[0]))
 
     def test_3(self):
         sf = wrapper.SplitFeeder("""One line before an empty one.
@@ -119,8 +119,13 @@ And then an other line.""")
         current_line = sf.next()
         wrapper.parse_text(current_line, sf, items)
         print(items)
+        #assert_equal(1, len(items))
+        #assert_equal(
+            #"One line before an empty one.\n"
+            #"\n"
+            #"And then an other line.", str(items[0]))
         assert_equal(3, len(items))
-        assert_equal("One line before an empty one.", str(items[0]))
+        assert_equal("One line before an empty one.\n", str(items[0]))
         assert_equal("\n", str(items[1]))
         assert_equal("And then an other line.", str(items[2]))
 
@@ -132,7 +137,7 @@ And then an other line.""")
         wrapper.parse_text(current_line, sf, items)
         print(items)
         assert_equal(2, len(items))
-        assert_equal("Be careful.", str(items[0]))
+        assert_equal("Be careful.\n", str(items[0]))
 
     def test_5(self):
         sf = wrapper.SplitFeeder("""This:
@@ -141,7 +146,7 @@ Is not an option !""")
         current_line = sf.next()
         wrapper.parse_text(current_line, sf, items)
         assert_equal(1, len(items))
-        assert_equal("This: Is not an option !", str(items[0]))
+        assert_equal("This:\nIs not an option !", str(items[0]))
 
 
 class ParseAsOption(unittest.TestCase):
@@ -294,7 +299,7 @@ o -v, --verbose | Verbose mode.
         assert_equal(1, len(items))
         assert_equal("""\
 o -i, --in-place [SUFFIX] | edit files in place """
-                      """(makes backup if extension supplied)
+                     """(makes backup if extension supplied)
 """, str(items[0]))
 
     def test_4(self):
@@ -326,7 +331,7 @@ Options:
         current_line = sf.next()
         wrapper.parse_text(current_line, sf, items)
         assert_equal(3, len(items))
-        assert_equal("Description ... to be completed.", str(items[0]))
+        assert_equal("Description ... to be completed.\n", str(items[0]))
         assert_equal("\n", str(items[1]))
         assert_equal("""\
 Options:
@@ -478,8 +483,8 @@ Report bugs to <bug-coreutils@gnu.org>.
         assert_equal(13, len(items))
         assert_equal(
             "List information about the FILEs (the current directory "
-            "by default). Sort entries alphabetically if none of "
-            "-cftuvSUX nor --sort.",
+            "by default).\nSort entries alphabetically if none of "
+            "-cftuvSUX nor --sort.\n",
             str(items[1]))
         print("items parsed:")
         for item in items:
@@ -674,7 +679,7 @@ Report bugs to <bug-textutils@gnu.org>.
             """name = cat
   g [a OPTION]
   g [a FILE]\n""",
-            "Concatenate FILE(s), or standard input, to standard output.",
+            "Concatenate FILE(s), or standard input, to standard output.\n",
             "\n",
             """o -A, --show-all | equivalent to -vET
 o -b, --number-nonblank | number nonblank output lines
@@ -689,12 +694,12 @@ o -v, --show-nonprinting | use ^ and M- notation, except for LFD and TAB
 o --help | display this help and exit
 o --version | output version information and exit\n""",
             "\n",
-            "With no FILE, or when FILE is -, read standard input.",
+            "With no FILE, or when FILE is -, read standard input.\n",
             "\n",
             "o -B, --binary | use binary writes to the console device.\n",
             "\n",
             "\n",
-            "Report bugs to <bug-textutils@gnu.org>.",
+            "Report bugs to <bug-textutils@gnu.org>.\n",
         ]
         print("items parsed:")
         for i, item in enumerate(items):
@@ -725,7 +730,7 @@ writing to standard output.
 """, str(items[0]))
         assert_equal(
             """Translate, squeeze, and/or delete characters """
-            """from standard input, writing to standard output.""",
+            """from standard input,\nwriting to standard output.\n""",
             str(items[1]))
         assert_equal("\n", str(items[2]))
         print(items[3])
@@ -748,7 +753,8 @@ o --version | output version information and exit
         print(content)
         expected = [
             'Textarea:FILE',
-            'Text:Concatenate FILE(s), or standard input, to standard output.',
+            'Text:Concatenate FILE(s), or standard input, '
+            'to standard output.\n',
             'Break',
             'Checkbox:-A, --show-all False',
             'Checkbox:-b, --number-nonblank False',
@@ -763,12 +769,12 @@ o --version | output version information and exit
             'Checkbox:--help False',
             'Checkbox:--version False',
             'Break',
-            'Text:With no FILE, or when FILE is -, read standard input.',
+            'Text:With no FILE, or when FILE is -, read standard input.\n',
             'Break',
             'Checkbox:-B, --binary False',
             'Break',
             'Break',
-            'Text:Report bugs to <bug-textutils@gnu.org>.',
+            'Text:Report bugs to <bug-textutils@gnu.org>.\n',
         ]
         assert_equal(expected, content)
 
@@ -839,7 +845,7 @@ Report bugs to <bug-textutils@gnu.org>.
             'Textbox:SET1',
             'Textbox:SET2',
             'Text:Translate, squeeze, and/or delete characters from '
-            'standard input, writing to standard output.',
+            'standard input,\nwriting to standard output.\n',
             'Break',
             'Checkbox:-c, --complement False',
             'Checkbox:-d, --delete False',
@@ -849,49 +855,62 @@ Report bugs to <bug-textutils@gnu.org>.
             'Checkbox:--version False',
             'Break',
             'Text:SETs are specified as strings of characters.  '
-            'Most represent themselves. Interpreted sequences are:',
+            'Most represent themselves.\nInterpreted sequences are:\n',
             'Break',
             'Text:  \\NNN            '
-            'character with octal value NNN (1 to 3 octal digits)'
-            '   \\\\              backslash'
-            '   \\a              audible BEL'
-            '   \\b              backspace'
-            '   \\f              form feed'
-            '   \\n              new line'
-            '   \\r              return'
-            '   \\t              horizontal tab'
-            '   \\v              vertical tab'
-            '   CHAR1-CHAR2     all characters '
-            'from CHAR1 to CHAR2 in ascending order'
-            '   [CHAR1-CHAR2]   same as CHAR1-CHAR2, '
-            'if both SET1 and SET2 use this   '
-            '[CHAR*]         in SET2, copies of CHAR until length of SET1'
-            '   [CHAR*REPEAT]   REPEAT copies of CHAR, REPEAT octal '
-            'if starting with 0'
-            '   [:alnum:]       all letters and digits'
-            '   [:alpha:]       all letters'
-            '   [:blank:]       all horizontal whitespace'
-            '   [:cntrl:]       all control characters'
-            '   [:digit:]       all digits'
-            '   [:graph:]       all printable characters, not including space'
-            '   [:lower:]       all lower case letters'
-            '   [:print:]       all printable characters, including space'
-            '   [:punct:]       all punctuation characters'
-            '   [:space:]       all horizontal or vertical whitespace'
-            '   [:upper:]       all upper case letters'
-            '   [:xdigit:]      all hexadecimal digits'
-            '   [=CHAR=]        all characters which are equivalent to CHAR',
+            'character with octal value NNN (1 to 3 octal digits)\n'
+            '  \\\\              backslash\n'
+            '  \\a              audible BEL\n'
+            '  \\b              backspace\n'
+            '  \\f              form feed\n'
+            '  \\n              new line\n'
+            '  \\r              return\n'
+            '  \\t              horizontal tab\n'
+            '  \\v              vertical tab\n'
+            '  CHAR1-CHAR2     all characters '
+            'from CHAR1 to CHAR2 in ascending order\n'
+            '  [CHAR1-CHAR2]   same as CHAR1-CHAR2, '
+            'if both SET1 and SET2 use this\n'
+            '  [CHAR*]         in SET2, copies of CHAR until length of SET1\n'
+            '  [CHAR*REPEAT]   REPEAT copies of CHAR, REPEAT octal '
+            'if starting with 0\n'
+            '  [:alnum:]       all letters and digits\n'
+            '  [:alpha:]       all letters\n'
+            '  [:blank:]       all horizontal whitespace\n'
+            '  [:cntrl:]       all control characters\n'
+            '  [:digit:]       all digits\n'
+            '  [:graph:]       all printable characters, '
+            'not including space\n'
+            '  [:lower:]       all lower case letters\n'
+            '  [:print:]       all printable characters, including space\n'
+            '  [:punct:]       all punctuation characters\n'
+            '  [:space:]       all horizontal or vertical whitespace\n'
+            '  [:upper:]       all upper case letters\n'
+            '  [:xdigit:]      all hexadecimal digits\n'
+            '  [=CHAR=]        all characters which are equivalent to CHAR\n',
             'Break',
             'Text:Translation occurs if -d is not given and both '
-            'SET1 and SET2 appear. -t may be used only when translating.'
-            '  SET2 is extended to length of SET1 by repeating its last '
-            'character as necessary.  Excess characters of SET2 are ignored.'
-            '  Only [:lower:] and [:upper:] are guaranteed to expand in '
-            'ascending order; used in SET2 while translating, they may only '
+            'SET1 and SET2 appear.\n-t may be used only when translating.'
+            '  SET2 is extended to length of\nSET1 by repeating its last '
+            'character as necessary.  Excess characters\nof SET2 are ignored.'
+            '  Only [:lower:] and [:upper:] are guaranteed to\nexpand in '
+            'ascending order; used in SET2 while translating, they may\nonly '
             'be used in pairs to specify case conversion.  -s uses SET1 '
-            'if not translating nor deleting; else squeezing uses SET2 '
-            'and occurs after translation or deletion.',
+            'if not\ntranslating nor deleting; else squeezing uses SET2 '
+            'and occurs after\ntranslation or deletion.\n',
             'Break',
-            'Text:Report bugs to <bug-textutils@gnu.org>.'
+            'Text:Report bugs to <bug-textutils@gnu.org>.\n'
         ]
         assert_equal(expected, content)
+
+
+# ipdb debugging
+#def main():
+    #from ipdb import launch_ipdb_on_exception
+
+    #with launch_ipdb_on_exception():
+        #tester = ParseHelp()
+        #tester.test_build_2()
+
+#if ("__main__" == __name__):
+    #main()
