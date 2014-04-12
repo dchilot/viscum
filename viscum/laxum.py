@@ -4,6 +4,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 
+import abc
 import argparse
 import sys
 import re
@@ -123,6 +124,9 @@ class Stdin(object):
     def __str__(self):
         return '-'
 
+    def build(self, form, content):
+        content.append(form.Textarea("stdin"))
+
 
 class Option(object):
     def __init__(self, parsed_option):
@@ -208,10 +212,22 @@ class Parameter(object):
         return "p " + self._name
 
     def build(self, form, content):
-        pass
+        raise NotImplementedError
 
 
 class BaseGroup(object):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def _left(self):
+        """Left delimiter for the group."""
+        pass
+
+    @abc.abstractmethod
+    def _right(self):
+        """Right delimiter for the group."""
+        pass
+
     def __init__(self, parsed_group):
         self._raw = parsed_group
         self._elements = []
@@ -306,7 +322,8 @@ class EmptyLine(object):
         return "\n"
 
     def build(self, form, content):
-        pass
+        content.append(form.Break())
+        #raise NotImplementedError
 
 
 class Text(object):
@@ -317,7 +334,8 @@ class Text(object):
         return self.text
 
     def build(self, form, content):
-        pass
+        content.append(form.Text(self.text))
+        #raise NotImplementedError
 
 
 class OptionGroup(object):
@@ -389,14 +407,14 @@ def parse_as_option(string):
 
 
 RE_IS_NOT_OPTION_START = re.compile(
-    """^--?[A-Za-z0-9][-A-Za-z0-9_]*( [-A-Za-z0-9_]+,?)+\..*""")
+    r"""^--?[A-Za-z0-9][-A-Za-z0-9_]*( [-A-Za-z0-9_]+,?)+\..*""")
 RE_IS_OPTION_START = re.compile(
-    """\s*(--?[A-Za-z0-9][-A-Za-z0-9_]*"""
-    """((\[=?[A-Za-z0-9][-A-Za-z0-9_]*])|([= ][A-Za-z0-9][-A-Za-z0-9_]*))?)"""
-    """(, (--?[A-Za-z0-9][-A-Za-z0-9_]*("""
-    """(\[=?[A-Za-z0-9][-A-Za-z0-9_]*])|([= ][A-Za-z0-9][-A-Za-z0-9_]*))?))*"""
-    """(( :? ?.*)|)$""")
-RE_IS_PSEUDO_OPTION_START = re.compile("\s*(-|[a-z]+) +((...)?:)? [A-Za-z].*")
+    r"\s*(--?[A-Za-z0-9][-A-Za-z0-9_]*"
+    r"((\[=?[A-Za-z0-9][-A-Za-z0-9_]*])|([= ][A-Za-z0-9][-A-Za-z0-9_]*))?)"
+    r"(, (--?[A-Za-z0-9][-A-Za-z0-9_]*("
+    r"(\[=?[A-Za-z0-9][-A-Za-z0-9_]*])|([= ][A-Za-z0-9][-A-Za-z0-9_]*))?))*"
+    r"(( :? ?.*)|)$")
+RE_IS_PSEUDO_OPTION_START = re.compile(r"\s*(-|[a-z]+) +((...)?:)? [A-Za-z].*")
 
 
 def is_option_start(line):
@@ -523,6 +541,60 @@ def get_help(program, help_command):
     return str(run(help_command))
 
 
+import json
+
+
+class JsonForm(object):
+    """Class used to build the json."""
+
+    def __init__(self):
+        pass
+
+    def Radio(self, name, args):
+        dico = {
+            'control': 'radio',
+            'name': name,
+            'args': args,
+        }
+        return dico
+
+    def Break(self):
+        dico = {
+            'control': 'break',
+        }
+        return dico
+
+    def Checkbox(self, name, checked=False, value=""):
+        dico = {
+            'control': 'checkbox',
+            'name': name,
+            'checked': checked,
+            'value': value,
+        }
+        return dico
+
+    def Text(self, content):
+        dico = {
+            'control': 'text',
+            'content': content,
+            }
+        return dico
+
+    def Textarea(self, name):
+        dico = {
+            'control': 'textarea',
+            'name': name,
+        }
+        return dico
+
+    def Textbox(self, name):
+        dico = {
+            'control': 'textbox',
+            'name': name,
+        }
+        return dico
+
+
 def main(argv):
     """
     `argv`: command line arguments without the name of the program (poped $0).
@@ -539,14 +611,18 @@ def main(argv):
         default="--help")
     parser.add_argument("program")
     arguments = parser.parse_args(argv)
-    if (arguments.json):
-        print("json dump requested but not available yet.")
     help_text = get_help(arguments.program, arguments.help_command)
-    print(help_text)
-    for item in parse_help(help_text):
-        print(item)
+    #print(help_text)
+    if (arguments.json):
+        json_form = JsonForm()
+        content = []
+        for item in parse_help(help_text):
+            item.build(json_form, content)
+        print(json.dumps(content))
+    else:
+        for item in parse_help(help_text):
+            print(item)
 
 
 if ("__main__" == __name__):
-    import sys
     main(sys.argv[1:])

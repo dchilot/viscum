@@ -341,20 +341,23 @@ class MockForm(object):
     def __init__(self):
         pass
 
+    def Break(self):
+        return "Break"
+
     def Radio(self, name, args):
         return "Radio:" + str(name)
 
     def Checkbox(self, name, checked=False, value=""):
         return "Checkbox:" + str(name) + " " + str(checked)
 
+    def Text(self, content):
+        return "Text:" + content
+
     def Textarea(self, name):
         return "Textarea:" + str(name)
 
     def Textbox(self, name):
         return "Textbox:" + str(name)
-
-    #def Radio(self, name):
-        #return "Radio:" + str(name)
 
 
 class ParseHelp(unittest.TestCase):
@@ -745,6 +748,8 @@ o --version | output version information and exit
         print(content)
         expected = [
             'Textarea:FILE',
+            'Text:Concatenate FILE(s), or standard input, to standard output.',
+            'Break',
             'Checkbox:-A, --show-all False',
             'Checkbox:-b, --number-nonblank False',
             'Checkbox:-e False',
@@ -757,7 +762,13 @@ o --version | output version information and exit
             'Checkbox:-v, --show-nonprinting False',
             'Checkbox:--help False',
             'Checkbox:--version False',
+            'Break',
+            'Text:With no FILE, or when FILE is -, read standard input.',
+            'Break',
             'Checkbox:-B, --binary False',
+            'Break',
+            'Break',
+            'Text:Report bugs to <bug-textutils@gnu.org>.',
         ]
         assert_equal(expected, content)
 
@@ -827,11 +838,60 @@ Report bugs to <bug-textutils@gnu.org>.
         expected = [
             'Textbox:SET1',
             'Textbox:SET2',
+            'Text:Translate, squeeze, and/or delete characters from '
+            'standard input, writing to standard output.',
+            'Break',
             'Checkbox:-c, --complement False',
             'Checkbox:-d, --delete False',
             'Checkbox:-s, --squeeze-repeats False',
             'Checkbox:-t, --truncate-set1 False',
             'Checkbox:--help False',
             'Checkbox:--version False',
+            'Break',
+            'Text:SETs are specified as strings of characters.  '
+            'Most represent themselves. Interpreted sequences are:',
+            'Break',
+            'Text:  \\NNN            '
+            'character with octal value NNN (1 to 3 octal digits)'
+            '   \\\\              backslash'
+            '   \\a              audible BEL'
+            '   \\b              backspace'
+            '   \\f              form feed'
+            '   \\n              new line'
+            '   \\r              return'
+            '   \\t              horizontal tab'
+            '   \\v              vertical tab'
+            '   CHAR1-CHAR2     all characters '
+            'from CHAR1 to CHAR2 in ascending order'
+            '   [CHAR1-CHAR2]   same as CHAR1-CHAR2, '
+            'if both SET1 and SET2 use this   '
+            '[CHAR*]         in SET2, copies of CHAR until length of SET1'
+            '   [CHAR*REPEAT]   REPEAT copies of CHAR, REPEAT octal '
+            'if starting with 0'
+            '   [:alnum:]       all letters and digits'
+            '   [:alpha:]       all letters'
+            '   [:blank:]       all horizontal whitespace'
+            '   [:cntrl:]       all control characters'
+            '   [:digit:]       all digits'
+            '   [:graph:]       all printable characters, not including space'
+            '   [:lower:]       all lower case letters'
+            '   [:print:]       all printable characters, including space'
+            '   [:punct:]       all punctuation characters'
+            '   [:space:]       all horizontal or vertical whitespace'
+            '   [:upper:]       all upper case letters'
+            '   [:xdigit:]      all hexadecimal digits'
+            '   [=CHAR=]        all characters which are equivalent to CHAR',
+            'Break',
+            'Text:Translation occurs if -d is not given and both '
+            'SET1 and SET2 appear. -t may be used only when translating.'
+            '  SET2 is extended to length of SET1 by repeating its last '
+            'character as necessary.  Excess characters of SET2 are ignored.'
+            '  Only [:lower:] and [:upper:] are guaranteed to expand in '
+            'ascending order; used in SET2 while translating, they may only '
+            'be used in pairs to specify case conversion.  -s uses SET1 '
+            'if not translating nor deleting; else squeezing uses SET2 '
+            'and occurs after translation or deletion.',
+            'Break',
+            'Text:Report bugs to <bug-textutils@gnu.org>.'
         ]
         assert_equal(expected, content)
