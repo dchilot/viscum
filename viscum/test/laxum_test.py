@@ -1,4 +1,4 @@
-from nose.tools import assert_equals
+from nose.tools import assert_equal
 from nose.tools import assert_true
 from nose.tools import assert_false
 import unittest
@@ -12,34 +12,34 @@ class SplitFeeder(unittest.TestCase):
         found = False
         while (found is not None):
             found = sf.next()
-            assert_equals(expected.pop(0), found)
+            assert_equal(expected.pop(0), found)
 
     def test_2(self):
         sf = wrapper.SplitFeeder("", " ")
-        assert_equals(sf.next(), None)
+        assert_equal(sf.next(), None)
 
     def test_3(self):
         sf = wrapper.SplitFeeder("Nospaceinhere.", " ")
-        assert_equals(sf.next(), "Nospaceinhere.")
-        assert_equals(sf.next(), None)
+        assert_equal(sf.next(), "Nospaceinhere.")
+        assert_equal(sf.next(), None)
 
     def test_4(self):
         sf = wrapper.SplitFeeder("endswithaspace ", " ")
-        assert_equals(sf.next(), "endswithaspace")
-        assert_equals(sf.next(), None)
+        assert_equal(sf.next(), "endswithaspace")
+        assert_equal(sf.next(), None)
 
     def test_5(self):
         sf = wrapper.SplitFeeder("1 2 3", " ")
-        assert_equals(sf.next(), "1")
-        assert_equals(sf.next(), "2")
+        assert_equal(sf.next(), "1")
+        assert_equal(sf.next(), "2")
         sf.reset()
-        assert_equals(sf.next(), "1")
-        assert_equals(sf.next(), "2")
-        assert_equals(sf.next(), "3")
-        assert_equals(sf.next(), None)
-        assert_equals(sf.next(), None)
+        assert_equal(sf.next(), "1")
+        assert_equal(sf.next(), "2")
+        assert_equal(sf.next(), "3")
+        assert_equal(sf.next(), None)
+        assert_equal(sf.next(), None)
         sf.reset()
-        assert_equals(sf.next(), "1")
+        assert_equal(sf.next(), "1")
 
 
 class IsOptionStart(unittest.TestCase):
@@ -97,8 +97,8 @@ On more than one line. It is important: there is a trap !""")
         items = []
         current_line = sf.next()
         wrapper.parse_text(current_line, sf, items)
-        assert_equals(1, len(items))
-        assert_equals(
+        assert_equal(1, len(items))
+        assert_equal(
             "This is some text. On more than one line."
             " It is important: there is a trap !", str(items[0]))
 
@@ -108,8 +108,8 @@ On more than one line. It is important: there is a trap !""")
         items = []
         current_line = sf.next()
         wrapper.parse_text(current_line, sf, items)
-        assert_equals(1, len(items))
-        assert_equals("Single line.", str(items[0]))
+        assert_equal(1, len(items))
+        assert_equal("Single line.", str(items[0]))
 
     def test_3(self):
         sf = wrapper.SplitFeeder("""One line before an empty one.
@@ -119,10 +119,10 @@ And then an other line.""")
         current_line = sf.next()
         wrapper.parse_text(current_line, sf, items)
         print(items)
-        assert_equals(3, len(items))
-        assert_equals("One line before an empty one.", str(items[0]))
-        assert_equals("\n", str(items[1]))
-        assert_equals("And then an other line.", str(items[2]))
+        assert_equal(3, len(items))
+        assert_equal("One line before an empty one.", str(items[0]))
+        assert_equal("\n", str(items[1]))
+        assert_equal("And then an other line.", str(items[2]))
 
     def test_4(self):
         sf = wrapper.SplitFeeder("""Be careful.
@@ -131,8 +131,8 @@ And then an other line.""")
         current_line = sf.next()
         wrapper.parse_text(current_line, sf, items)
         print(items)
-        assert_equals(2, len(items))
-        assert_equals("Be careful.", str(items[0]))
+        assert_equal(2, len(items))
+        assert_equal("Be careful.", str(items[0]))
 
     def test_5(self):
         sf = wrapper.SplitFeeder("""This:
@@ -140,53 +140,53 @@ Is not an option !""")
         items = []
         current_line = sf.next()
         wrapper.parse_text(current_line, sf, items)
-        assert_equals(1, len(items))
-        assert_equals("This: Is not an option !", str(items[0]))
+        assert_equal(1, len(items))
+        assert_equal("This: Is not an option !", str(items[0]))
 
 
 class ParseAsOption(unittest.TestCase):
     def test_1(self):
         parsed_option = wrapper.parse_as_option(
             " --option parameter   Short description of the option.")
-        assert_equals("--option", "".join(parsed_option.first_option))
-        assert_equals("parameter", parsed_option.parameter)
-        assert_equals(
+        assert_equal("--option", "".join(parsed_option.first_option))
+        assert_equal("parameter", parsed_option.parameter)
+        assert_equal(
             "Short description of the option.",
             "".join("".join(parsed_option.description)))
 
     def test_2(self):
         parsed_option = wrapper.parse_as_option(
             " -o, --option param   Short description of the option.")
-        assert_equals("-o", "".join(parsed_option.first_option))
+        assert_equal("-o", "".join(parsed_option.first_option))
         print("parsed_option.other_options")
         print(parsed_option.other_options)
-        assert_equals(
+        assert_equal(
             "--option",
             "".join(parsed_option.other_options[0].option))
-        assert_equals(
+        assert_equal(
             "param",
             "".join(parsed_option.other_options[0].parameter))
-        assert_equals(
+        assert_equal(
             "Short description of the option.",
             "".join("".join(parsed_option.description)))
 
     def test_3(self):
         parsed_option = wrapper.parse_as_option(
             " -w, --word  Short description of the option.")
-        assert_equals("-w", "".join(parsed_option.first_option))
-        assert_equals("--word", "".join(parsed_option.other_options[0]))
-        assert_equals("", parsed_option.parameter)
-        assert_equals(
+        assert_equal("-w", "".join(parsed_option.first_option))
+        assert_equal("--word", "".join(parsed_option.other_options[0]))
+        assert_equal("", parsed_option.parameter)
+        assert_equal(
             "Short description of the option.",
             "".join("".join(parsed_option.description)))
 
     def test_4(self):
         parsed_option = wrapper.parse_as_option(
             "  -w, --word  Short description of the option.")
-        assert_equals("-w", "".join(parsed_option.first_option))
-        assert_equals("--word", "".join(parsed_option.other_options[0]))
-        assert_equals("", parsed_option.parameter)
-        assert_equals(
+        assert_equal("-w", "".join(parsed_option.first_option))
+        assert_equal("--word", "".join(parsed_option.other_options[0]))
+        assert_equal("", parsed_option.parameter)
+        assert_equal(
             "Short description of the option.",
             "".join("".join(parsed_option.description)))
 
@@ -194,9 +194,9 @@ class ParseAsOption(unittest.TestCase):
         parsed_option = wrapper.parse_as_option(
             """ --xx Xxx
     Here is the description.""")
-        assert_equals("--xx", "".join(parsed_option.first_option))
-        assert_equals("Xxx", parsed_option.parameter)
-        assert_equals(
+        assert_equal("--xx", "".join(parsed_option.first_option))
+        assert_equal("Xxx", parsed_option.parameter)
+        assert_equal(
             "\nHere is the description.",
             "".join("".join(parsed_option.description)))
 
@@ -205,9 +205,9 @@ class ParseAsOption(unittest.TestCase):
             """ --yy Yyy
     Here is the description. And it is
     on more than one line.""")
-        assert_equals("--yy", "".join(parsed_option.first_option))
-        assert_equals("Yyy", parsed_option.parameter)
-        assert_equals(
+        assert_equal("--yy", "".join(parsed_option.first_option))
+        assert_equal("Yyy", parsed_option.parameter)
+        assert_equal(
             """\nHere is the description. And it is
 on more than one line.""", "".join("".join(parsed_option.description)))
 
@@ -261,8 +261,8 @@ class ParseOption(unittest.TestCase):
         current_line = sf.next()
         og = wrapper.OptionGroup()
         wrapper.parse_option(current_line, sf, items, og)
-        assert_equals(1, len(items))
-        assert_equals("""\
+        assert_equal(1, len(items))
+        assert_equal("""\
 o -f, --file name | Give a file to process.
 o -v, --verbose | Verbose mode.
 """, str(items[0]))
@@ -276,8 +276,8 @@ o -v, --verbose | Verbose mode.
         current_line = sf.next()
         og = wrapper.OptionGroup()
         wrapper.parse_option(current_line, sf, items, og)
-        assert_equals(1, len(items))
-        assert_equals("""\
+        assert_equal(1, len(items))
+        assert_equal("""\
 o -f, --file name | Give a file to process.
 o -v, --verbose | Verbose mode.
 """, str(items[0]))
@@ -291,8 +291,8 @@ o -v, --verbose | Verbose mode.
         current_line = sf.next()
         og = wrapper.OptionGroup()
         wrapper.parse_option(current_line, sf, items, og)
-        assert_equals(1, len(items))
-        assert_equals("""\
+        assert_equal(1, len(items))
+        assert_equal("""\
 o -i, --in-place [SUFFIX] | edit files in place """
                       """(makes backup if extension supplied)
 """, str(items[0]))
@@ -305,8 +305,8 @@ o -i, --in-place [SUFFIX] | edit files in place """
         current_line = sf.next()
         og = wrapper.OptionGroup()
         wrapper.parse_option(current_line, sf, items, og)
-        assert_equals(1, len(items))
-        assert_equals("""\
+        assert_equal(1, len(items))
+        assert_equal("""\
 o -L, --files-without-match | only print FILE names containing no match
 """, str(items[0]))
 
@@ -325,10 +325,10 @@ Options:
         items = []
         current_line = sf.next()
         wrapper.parse_text(current_line, sf, items)
-        assert_equals(3, len(items))
-        assert_equals("Description ... to be completed.", str(items[0]))
-        assert_equals("\n", str(items[1]))
-        assert_equals("""\
+        assert_equal(3, len(items))
+        assert_equal("Description ... to be completed.", str(items[0]))
+        assert_equal("\n", str(items[1]))
+        assert_equal("""\
 Options:
 o -f | Description of flag f. Continued description.
 o --flag | Description on a different line.
@@ -472,8 +472,8 @@ Exit status is 0 if OK, 1 if minor problems, 2 if serious trouble.
 Report bugs to <bug-coreutils@gnu.org>.
 """
         items = wrapper.parse_help(ls_help)
-        assert_equals(13, len(items))
-        assert_equals(
+        assert_equal(13, len(items))
+        assert_equal(
             "List information about the FILEs (the current directory "
             "by default). Sort entries alphabetically if none of "
             "-cftuvSUX nor --sort.",
@@ -518,7 +518,7 @@ PYTHONCASEOK : ignore case in 'import' statements (Windows).
 
 """
         items = wrapper.parse_help(python_help)
-        assert_equals(4, len(items))
+        assert_equal(4, len(items))
         print("items parsed:")
         for item in items:
             print(item)
@@ -570,7 +570,7 @@ Be sure to include the word ``sed'' somewhere in the ``Subject:'' field.
         for i, item in enumerate(items):
             print(i)
             print(item)
-        assert_equals(7, len(items))
+        assert_equal(7, len(items))
         #assert(False)
 
     def test_4(self):
@@ -632,7 +632,7 @@ and 2 if trouble.
 Report bugs to <bug-gnu-utils@gnu.org>.
 """
         items = wrapper.parse_help(grep_help)
-        assert_equals(14, len(items))
+        assert_equal(14, len(items))
         print("items parsed:")
         for i, item in enumerate(items):
             print(i)
@@ -666,7 +666,7 @@ Report bugs to <bug-textutils@gnu.org>.
 
     def test_5(self):
         items = wrapper.parse_help(ParseHelp.cat_help)
-        assert_equals(11, len(items))
+        assert_equal(11, len(items))
         expected = [
             """name = cat
   g [a OPTION]
@@ -697,7 +697,7 @@ o --version | output version information and exit\n""",
         for i, item in enumerate(items):
             print(i)
             print(item)
-            assert_equals(expected.pop(0), str(item))
+            assert_equal(expected.pop(0), str(item))
         #assert(False)
 
     def test_6(self):
@@ -714,19 +714,19 @@ writing to standard output.
       --version           output version information and exit
 """
         items = wrapper.parse_help(tr_help_light)
-        assert_equals(4, len(items))
-        assert_equals("""name = tr
+        assert_equal(4, len(items))
+        assert_equal("""name = tr
   g [a OPTION]
   a SET1
   g [a SET2]
 """, str(items[0]))
-        assert_equals(
+        assert_equal(
             """Translate, squeeze, and/or delete characters """
             """from standard input, writing to standard output.""",
             str(items[1]))
-        assert_equals("\n", str(items[2]))
+        assert_equal("\n", str(items[2]))
         print(items[3])
-        assert_equals("""\
+        assert_equal("""\
 o -c, --complement | first complement SET1
 o -d, --delete | delete characters in SET1, do not translate
 o -s, --squeeze-repeats | replace sequence of characters with one
@@ -759,7 +759,7 @@ o --version | output version information and exit
             'Checkbox:--version False',
             'Checkbox:-B, --binary False',
         ]
-        assert_equals(expected, content)
+        assert_equal(expected, content)
 
     def test_build_2(self):
         tr_help = """
@@ -777,15 +777,15 @@ writing to standard output.
 SETs are specified as strings of characters.  Most represent themselves.
 Interpreted sequences are:
 
-  \NNN            character with octal value NNN (1 to 3 octal digits)
-  \\              backslash
-  \a              audible BEL
-  \b              backspace
-  \f              form feed
-  \n              new line
-  \r              return
-  \t              horizontal tab
-  \v              vertical tab
+  \\NNN            character with octal value NNN (1 to 3 octal digits)
+  \\\\              backslash
+  \\a              audible BEL
+  \\b              backspace
+  \\f              form feed
+  \\n              new line
+  \\r              return
+  \\t              horizontal tab
+  \\v              vertical tab
   CHAR1-CHAR2     all characters from CHAR1 to CHAR2 in ascending order
   [CHAR1-CHAR2]   same as CHAR1-CHAR2, if both SET1 and SET2 use this
   [CHAR*]         in SET2, copies of CHAR until length of SET1
@@ -834,4 +834,4 @@ Report bugs to <bug-textutils@gnu.org>.
             'Checkbox:--help False',
             'Checkbox:--version False',
         ]
-        assert_equals(expected, content)
+        assert_equal(expected, content)
