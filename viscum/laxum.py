@@ -14,6 +14,7 @@ from pyparsing import FollowedBy
 from pyparsing import alphas
 from pyparsing import alphanums
 from pyparsing import srange
+from pyparsing import printables
 from pyparsing import restOfLine
 import re
 
@@ -73,7 +74,7 @@ gGroup = Or([gCurlyGroup, gSquareGroup])
 gParameters = Optional(
     OneOrMore(Group(Or([gGroup, gElement])) + gSpaces))\
     .setResultsName("parameters")
-gName = (Word(alphas + "/.", alphanums + '_' + "/.")).setResultsName("name")
+gName = Word(printables).setResultsName("name")
 gUsage = Group(Or([
     Literal("Usage:"),
     Literal("usage:")]) +
