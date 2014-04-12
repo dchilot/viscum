@@ -118,7 +118,7 @@ And then an other line.""")
         items = []
         current_line = sf.next()
         wrapper.parse_text(current_line, sf, items)
-        print items
+        print(items)
         assert_equals(3, len(items))
         assert_equals("One line before an empty one.", str(items[0]))
         assert_equals("\n", str(items[1]))
@@ -130,7 +130,7 @@ And then an other line.""")
         items = []
         current_line = sf.next()
         wrapper.parse_text(current_line, sf, items)
-        print items
+        print(items)
         assert_equals(2, len(items))
         assert_equals("Be careful.", str(items[0]))
 
@@ -158,8 +158,8 @@ class ParseAsOption(unittest.TestCase):
         parsed_option = wrapper.parse_as_option(
             " -o, --option param   Short description of the option.")
         assert_equals("-o", "".join(parsed_option.first_option))
-        print "parsed_option.other_options"
-        print parsed_option.other_options
+        print("parsed_option.other_options")
+        print(parsed_option.other_options)
         assert_equals(
             "--option",
             "".join(parsed_option.other_options[0].option))
@@ -478,9 +478,9 @@ Report bugs to <bug-coreutils@gnu.org>.
             "by default). Sort entries alphabetically if none of "
             "-cftuvSUX nor --sort.",
             str(items[1]))
-        print "items parsed:"
+        print("items parsed:")
         for item in items:
-            print item
+            print(item)
 #        assert(False)
 
     def test_2(self):
@@ -519,9 +519,9 @@ PYTHONCASEOK : ignore case in 'import' statements (Windows).
 """
         items = wrapper.parse_help(python_help)
         assert_equals(4, len(items))
-        print "items parsed:"
+        print("items parsed:")
         for item in items:
-            print item
+            print(item)
         # the end of the help is not parsed properly but it is not important
         # for now because it is not to be used to generate anything to be used
         # to compute the GUI
@@ -566,10 +566,10 @@ E-mail bug reports to: bonzini@gnu.org .
 Be sure to include the word ``sed'' somewhere in the ``Subject:'' field.
 """
         items = wrapper.parse_help(sed_help)
-        print "items parsed:"
+        print("items parsed:")
         for i, item in enumerate(items):
-            print i
-            print item
+            print(i)
+            print(item)
         assert_equals(7, len(items))
         #assert(False)
 
@@ -633,10 +633,10 @@ Report bugs to <bug-gnu-utils@gnu.org>.
 """
         items = wrapper.parse_help(grep_help)
         assert_equals(14, len(items))
-        print "items parsed:"
+        print("items parsed:")
         for i, item in enumerate(items):
-            print i
-            print item
+            print(i)
+            print(item)
         #assert(False)
 
     cat_help = """
@@ -693,10 +693,10 @@ o --version | output version information and exit\n""",
             "\n",
             "Report bugs to <bug-textutils@gnu.org>.",
         ]
-        print "items parsed:"
+        print("items parsed:")
         for i, item in enumerate(items):
-            print i
-            print item
+            print(i)
+            print(item)
             assert_equals(expected.pop(0), str(item))
         #assert(False)
 
@@ -725,7 +725,7 @@ writing to standard output.
             """from standard input, writing to standard output.""",
             str(items[1]))
         assert_equals("\n", str(items[2]))
-        print items[3]
+        print(items[3])
         assert_equals("""\
 o -c, --complement | first complement SET1
 o -d, --delete | delete characters in SET1, do not translate
@@ -740,9 +740,9 @@ o --version | output version information and exit
         content = []
         mock = MockForm()
         for item in items:
-            print "Call build on " + str(item)
+            print("Call build on " + str(item))
             item.build(mock, content)
-        print content
+        print(content)
         expected = [
             'Textarea:FILE',
             'Checkbox:-A, --show-all False',
@@ -819,11 +819,11 @@ Report bugs to <bug-textutils@gnu.org>.
         content = []
         mock = MockForm()
         for item in items:
-            print "Call build on " + str(item)
+            print("Call build on " + str(item))
             item.build(mock, content)
-            print content[-1]
-        print "content:"
-        print content
+            print(content[-1])
+        print("content:")
+        print(content)
         expected = [
             'Textbox:SET1',
             'Textbox:SET2',

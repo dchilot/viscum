@@ -1,4 +1,12 @@
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+
 import argparse
+import sys
+import re
 
 
 from pyparsing import Literal
@@ -16,7 +24,6 @@ from pyparsing import alphanums
 from pyparsing import srange
 from pyparsing import printables
 from pyparsing import restOfLine
-import re
 
 #      _
 #     / \
@@ -340,6 +347,19 @@ class SplitFeeder(object):
         self._splitter = splitter
         self._position = 0
 
+    def __iter__(self):
+        self._position = 0
+        while ((self._position is not None) and
+                (self._position != len(self._string))):
+            start_index = self._position
+            finish_index = self._string.find(self._splitter, self._position)
+            if (-1 != finish_index):
+                self._position = finish_index + 1
+                yield self._string[start_index:finish_index]
+            else:
+                self._position = None
+                yield self._string[start_index:]
+
     def next(self):
         if ((self._position is not None) and
                 (self._position != len(self._string))):
@@ -520,11 +540,11 @@ def main(argv):
     parser.add_argument("program")
     arguments = parser.parse_args(argv)
     if (arguments.json):
-        print 'json dump requested but not available yet.'
+        print("json dump requested but not available yet.")
     help_text = get_help(arguments.program, arguments.help_command)
-    print help_text
+    print(help_text)
     for item in parse_help(help_text):
-        print item
+        print(item)
 
 
 if ("__main__" == __name__):
