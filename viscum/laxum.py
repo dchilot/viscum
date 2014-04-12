@@ -367,9 +367,15 @@ def parse_as_option(string):
     return parse_with(gOptionDescription, string)
 
 
-RE_IS_NOT_OPTION_START = re.compile("""^--?[A-Za-z0-9][-A-Za-z0-9_]*( [-A-Za-z0-9_]+,?)+\..*""")
-RE_IS_OPTION_START = re.compile("""\s*(--?[A-Za-z0-9][-A-Za-z0-9_]*((\[=?[A-Za-z0-9][-A-Za-z0-9_]*])|([= ][A-Za-z0-9][-A-Za-z0-9_]*))?)(, (--?[A-Za-z0-9][-A-Za-z0-9_]*((\[=?[A-Za-z0-9][-A-Za-z0-9_]*])|([= ][A-Za-z0-9][-A-Za-z0-9_]*))?))*(( :? ?.*)|)$""")
-RE_IS_PSEUDO_OPTION_START = re.compile("""\s*(-|[a-z]+) +((...)?:)? [A-Za-z].*""")
+RE_IS_NOT_OPTION_START = re.compile(
+    """^--?[A-Za-z0-9][-A-Za-z0-9_]*( [-A-Za-z0-9_]+,?)+\..*""")
+RE_IS_OPTION_START = re.compile(
+    """\s*(--?[A-Za-z0-9][-A-Za-z0-9_]*"""
+    """((\[=?[A-Za-z0-9][-A-Za-z0-9_]*])|([= ][A-Za-z0-9][-A-Za-z0-9_]*))?)"""
+    """(, (--?[A-Za-z0-9][-A-Za-z0-9_]*("""
+    """(\[=?[A-Za-z0-9][-A-Za-z0-9_]*])|([= ][A-Za-z0-9][-A-Za-z0-9_]*))?))*"""
+    """(( :? ?.*)|)$""")
+RE_IS_PSEUDO_OPTION_START = re.compile("\s*(-|[a-z]+) +((...)?:)? [A-Za-z].*")
 
 
 def is_option_start(line):
@@ -378,7 +384,7 @@ def is_option_start(line):
     else:
         return ((RE_IS_NOT_OPTION_START.match(line) is None) and
                 ((RE_IS_OPTION_START.match(line) is not None) or
-                (RE_IS_PSEUDO_OPTION_START.match(line) is not None)))
+                    (RE_IS_PSEUDO_OPTION_START.match(line) is not None)))
 
 
 def parse_text(text, feeder, items):

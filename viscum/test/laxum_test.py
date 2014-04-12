@@ -240,15 +240,16 @@ class ParseAsName(unittest.TestCase):
 class ParseAsParameters(unittest.TestCase):
     def test_1(self):
         wrapper.parse_with(
-             wrapper.gParameters,
-             """[option] ... [-c cmd | -m mod | file | -] [arg] ...""")
+            wrapper.gParameters,
+            """[option] ... [-c cmd | -m mod | file | -] [arg] ...""")
 
 
 class ParseAsUsage(unittest.TestCase):
     def test_1(self):
         wrapper.parse_with(
             wrapper.gUsage,
-            """usage: python [option] ... [-c cmd | -m mod | file | -] [arg] ...""")
+            """usage: python [option] ... """
+            """[-c cmd | -m mod | file | -] [arg] ...""")
 
 
 class ParseOption(unittest.TestCase):
