@@ -904,13 +904,77 @@ Report bugs to <bug-textutils@gnu.org>.
         assert_equal(expected, content)
 
 
-# ipdb debugging
+class GetHelp(unittest.TestCase):
+    def test_1(self):
+        wrapper.get_help('ls', '--help')
+
+
+class DumpJson(unittest.TestCase):
+    def test_1(self):
+        git_checkout_help = """\
+usage: git checkout [options] <branch>
+   or: git checkout [options] [<branch>] -- <file>...
+
+    -q, --quiet           suppress progress reporting
+    -b <branch>           create and checkout a new branch
+    -B <branch>           create/reset and checkout a branch
+    -l                    create reflog for new branch
+    --detach              detach the HEAD at named commit
+    -t, --track           set upstream info for new branch
+    --orphan <new branch>
+                          new unparented branch
+    -2, --ours            checkout our version for unmerged files
+    -3, --theirs          checkout their version for unmerged files
+    -f, --force           force checkout (throw away local modifications)
+    -m, --merge           perform a 3-way merge with the new branch
+    --overwrite-ignore    update ignored files (default)
+    --conflict <style>    conflict style (merge or diff3)
+    -p, --patch           select hunks interactively
+
+"""
+        dump = wrapper.dump_json(git_checkout_help)
+        import json
+        expected_json = json.loads(
+            '[{"control": "textbox", "name": "checkout"}, '
+            '{"control": "text", "content": "branch>\\n   '
+            'or: git checkout [options] [<branch>] -- <file>...\\n"}, '
+            '{"control": "break"}, '
+            '{"control": "checkbox", "checked": false, '
+            '"name": "-q, --quiet", "value": "bug"}, '
+            '{"control": "textarea", "name": "-b"}, '
+            '{"control": "textarea", "name": "-B"}, '
+            '{"control": "checkbox", "checked": false, '
+            '"name": "-l", "value": "bug"}, '
+            '{"control": "checkbox", "checked": false, '
+            '"name": "--detach", "value": "bug"}, '
+            '{"control": "checkbox", "checked": false, '
+            '"name": "-t, --track", "value": "bug"}, '
+            '{"control": "textarea", "name": "--orphan"}, '
+            '{"control": "checkbox", "checked": false, '
+            '"name": "-2, --ours", "value": "bug"}, '
+            '{"control": "checkbox", "checked": false, '
+            '"name": "-3, --theirs", "value": "bug"}, '
+            '{"control": "checkbox", "checked": false, '
+            '"name": "-f, --force", "value": "bug"}, '
+            '{"control": "checkbox", "checked": false, '
+            '"name": "-m, --merge", "value": "bug"}, '
+            '{"control": "checkbox", "checked": false, '
+            '"name": "--overwrite-ignore", "value": "bug"}, '
+            '{"control": "textarea", "name": "--conflict"}, '
+            '{"control": "checkbox", "checked": false, '
+            '"name": "-p, --patch", "value": "bug"}, '
+            '{"control": "break"}]')
+        assert_equal(expected_json, json.loads(dump))
+
+ #ipdb debugging
+
+
 #def main():
     #from ipdb import launch_ipdb_on_exception
 
     #with launch_ipdb_on_exception():
-        #tester = ParseHelp()
-        #tester.test_build_2()
+        #tester = DumpJson()
+        #tester.test_1()
 
 #if ("__main__" == __name__):
     #main()

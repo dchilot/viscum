@@ -8,12 +8,12 @@ import abc
 import argparse
 import sys
 import re
+import json
 
 
 from pyparsing import Literal
 from pyparsing import Optional
 from pyparsing import Group
-from pyparsing import Dict
 from pyparsing import Or
 from pyparsing import Regex
 from pyparsing import Word
@@ -45,10 +45,12 @@ gImportantSpaces = ZeroOrMore(gSpace)
 gInnerArgument = Word(alphas, alphanums + '_-').setResultsName("argument")
 gArgument = gSpace + gInnerArgument
 gInnerParameter = Word(alphas, alphanums + '_-')
+gExtendedInnerParameter = Word(alphas, alphanums + '_- ')
 gInnerParameterPlus = Or([gSpace, Literal('=')]).suppress() + gInnerParameter
 gInnerParameterPlusLess = \
     Optional(Or([gSpace, Literal('=')]).suppress()) + gInnerParameter
 gParameter = (Or([
+    Group(gSpace + Literal('<') + gExtendedInnerParameter + Literal('>')),
     Group(Literal('[') + gInnerParameterPlusLess + Literal(']')),
     gInnerParameterPlus + FollowedBy(
         Or([
@@ -552,9 +554,6 @@ def get_help(program, help_command):
     return str(run(help_command))
 
 
-import json
-
-
 class JsonForm(object):
     """Class used to build the json."""
 
@@ -606,6 +605,14 @@ class JsonForm(object):
         return dico
 
 
+def dump_json(help_text):
+    json_form = JsonForm()
+    content = []
+    for item in parse_help(help_text):
+        item.build(json_form, content)
+    return json.dumps(content)
+
+
 def main(argv):
     """
     `argv`: command line arguments without the name of the program (poped $0).
@@ -625,15 +632,11 @@ def main(argv):
     help_text = get_help(arguments.program, arguments.help_command)
     #print(help_text)
     if (arguments.json):
-        json_form = JsonForm()
-        content = []
-        for item in parse_help(help_text):
-            item.build(json_form, content)
-        print(json.dumps(content))
+        print(dump_json(help_text))
     else:
         for item in parse_help(help_text):
             print(item)
 
 
 if ("__main__" == __name__):
-    main(sys.argv[1:])
+    main(sys.argv[1:])  # pragma: no coverage
