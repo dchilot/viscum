@@ -605,18 +605,23 @@ class JsonForm(object):
         return dico
 
 
-def dump_json(help_text, pretty=False):
+def dump_json(name, path, help_text, pretty=False):
     json_form = JsonForm()
     content = []
     for item in parse_help(help_text):
         item.build(json_form, content)
+    program = {
+        'name': name,
+        'path': path,
+        'content': content,
+    }
     if (pretty):
         return json.dumps(
-            content,
+            program,
             sort_keys=True,
             indent=4, separators=(',', ': '))
     else:
-        return json.dumps(content)
+        return json.dumps(program)
 
 
 def main(argv):
@@ -641,9 +646,15 @@ def main(argv):
     parser.add_argument("program")
     arguments = parser.parse_args(argv)
     help_text = get_help(arguments.program, arguments.help_command)
+    import os
+    program = os.path.basename(arguments.program)
+    path = os.path.abspath(arguments.program)
+    if (not os.path.exists(path)):
+        import sh
+        path = sh.which(arguments.program)
     #print(help_text)
     if (arguments.json):
-        print(dump_json(help_text, arguments.pretty_json))
+        print(dump_json(program, path, help_text, arguments.pretty_json))
     else:
         for item in parse_help(help_text):
             print(item)

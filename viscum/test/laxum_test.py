@@ -932,138 +932,113 @@ usage: git checkout [options] <branch>
     -p, --patch           select hunks interactively
 
 """
-        dump = wrapper.dump_json(git_checkout_help)
+        dump = wrapper.dump_json("git", "/usr/bin/git", git_checkout_help)
         import json
-        expected_json = json.loads(
-            '[{"control": "textbox", "name": "checkout"}, '
-            '{"control": "text", "content": "branch>\\n   '
-            'or: git checkout [options] [<branch>] -- <file>...\\n"}, '
-            '{"control": "break"}, '
-            '{"control": "checkbox", "checked": false, '
-            '"name": "-q, --quiet", "value": "bug"}, '
-            '{"control": "textarea", "name": "-b"}, '
-            '{"control": "textarea", "name": "-B"}, '
-            '{"control": "checkbox", "checked": false, '
-            '"name": "-l", "value": "bug"}, '
-            '{"control": "checkbox", "checked": false, '
-            '"name": "--detach", "value": "bug"}, '
-            '{"control": "checkbox", "checked": false, '
-            '"name": "-t, --track", "value": "bug"}, '
-            '{"control": "textarea", "name": "--orphan"}, '
-            '{"control": "checkbox", "checked": false, '
-            '"name": "-2, --ours", "value": "bug"}, '
-            '{"control": "checkbox", "checked": false, '
-            '"name": "-3, --theirs", "value": "bug"}, '
-            '{"control": "checkbox", "checked": false, '
-            '"name": "-f, --force", "value": "bug"}, '
-            '{"control": "checkbox", "checked": false, '
-            '"name": "-m, --merge", "value": "bug"}, '
-            '{"control": "checkbox", "checked": false, '
-            '"name": "--overwrite-ignore", "value": "bug"}, '
-            '{"control": "textarea", "name": "--conflict"}, '
-            '{"control": "checkbox", "checked": false, '
-            '"name": "-p, --patch", "value": "bug"}, '
-            '{"control": "break"}]')
-        assert_equal(expected_json, json.loads(dump))
         expected_pretty_json = """\
-[
-    {
-        "control": "textbox",
-        "name": "checkout"
-    },
-    {
-        "content": "branch>\\n"""\
+{
+    "content": [
+        {
+            "control": "textbox",
+            "name": "checkout"
+        },
+        {
+            "content": "branch>\\n"""\
 """   or: git checkout [options] [<branch>] -- <file>...\\n",
-        "control": "text"
-    },
-    {
-        "control": "break"
-    },
-    {
-        "checked": false,
-        "control": "checkbox",
-        "name": "-q, --quiet",
-        "value": "bug"
-    },
-    {
-        "control": "textarea",
-        "name": "-b"
-    },
-    {
-        "control": "textarea",
-        "name": "-B"
-    },
-    {
-        "checked": false,
-        "control": "checkbox",
-        "name": "-l",
-        "value": "bug"
-    },
-    {
-        "checked": false,
-        "control": "checkbox",
-        "name": "--detach",
-        "value": "bug"
-    },
-    {
-        "checked": false,
-        "control": "checkbox",
-        "name": "-t, --track",
-        "value": "bug"
-    },
-    {
-        "control": "textarea",
-        "name": "--orphan"
-    },
-    {
-        "checked": false,
-        "control": "checkbox",
-        "name": "-2, --ours",
-        "value": "bug"
-    },
-    {
-        "checked": false,
-        "control": "checkbox",
-        "name": "-3, --theirs",
-        "value": "bug"
-    },
-    {
-        "checked": false,
-        "control": "checkbox",
-        "name": "-f, --force",
-        "value": "bug"
-    },
-    {
-        "checked": false,
-        "control": "checkbox",
-        "name": "-m, --merge",
-        "value": "bug"
-    },
-    {
-        "checked": false,
-        "control": "checkbox",
-        "name": "--overwrite-ignore",
-        "value": "bug"
-    },
-    {
-        "control": "textarea",
-        "name": "--conflict"
-    },
-    {
-        "checked": false,
-        "control": "checkbox",
-        "name": "-p, --patch",
-        "value": "bug"
-    },
-    {
-        "control": "break"
-    }
-]"""
+            "control": "text"
+        },
+        {
+            "control": "break"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-q, --quiet",
+            "value": "bug"
+        },
+        {
+            "control": "textarea",
+            "name": "-b"
+        },
+        {
+            "control": "textarea",
+            "name": "-B"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-l",
+            "value": "bug"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "--detach",
+            "value": "bug"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-t, --track",
+            "value": "bug"
+        },
+        {
+            "control": "textarea",
+            "name": "--orphan"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-2, --ours",
+            "value": "bug"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-3, --theirs",
+            "value": "bug"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-f, --force",
+            "value": "bug"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-m, --merge",
+            "value": "bug"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "--overwrite-ignore",
+            "value": "bug"
+        },
+        {
+            "control": "textarea",
+            "name": "--conflict"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-p, --patch",
+            "value": "bug"
+        },
+        {
+            "control": "break"
+        }
+    ],
+    "name": "git",
+    "path": "/usr/bin/git"
+}"""
+        expected_json = json.loads(expected_pretty_json)
+        assert_equal(expected_json, json.loads(dump))
         assert_equal(
             expected_pretty_json,
-            wrapper.dump_json(git_checkout_help, True))
+            wrapper.dump_json("git", "/usr/bin/git", git_checkout_help, True))
 
- #ipdb debugging
+#ipdb debugging
 
 
 #def main():
