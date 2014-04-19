@@ -548,10 +548,14 @@ def parse_help(input):
     return items
 
 
-def get_help(program, help_command):
+def get_help(program, arguments, help_command):
     import sh
     run = sh.Command(program)
-    return str(run(help_command.split(' '), _ok_code=list(range(0, 255))))
+    args = arguments + [help_command.lstrip(' ')]
+    print("args =", args)
+    return str(run(
+        args,
+        _ok_code=list(range(0, 255))))
 
 
 class JsonForm(object):
@@ -605,23 +609,26 @@ class JsonForm(object):
         return dico
 
 
-def dump_json(name, path, help_text, pretty=False):
+def dump_json(name, arguments, path, help_text, pretty=False):
     json_form = JsonForm()
     content = []
     for item in parse_help(help_text):
         item.build(json_form, content)
-    program = {
-        'name': name,
-        'path': path,
+    output = {
+        'program': {
+            'name': name,
+            'arguments': arguments,
+            'path': path,
+        },
         'content': content,
     }
     if (pretty):
         return json.dumps(
-            program,
+            output,
             sort_keys=True,
             indent=4, separators=(',', ': '))
     else:
-        return json.dumps(program)
+        return json.dumps(output)
 
 
 def main(argv):
@@ -640,12 +647,20 @@ def main(argv):
         default=False,
         action='store_true')
     parser.add_argument(
+        "-x", "--extra-arguments",
+        help="Extra argument you need to pass to the program.",
+        default=[],
+        action='append')
+    parser.add_argument(
         "-c", "--help-command",
         help="What needs to be given to make the program display help.",
         default="--help")
     parser.add_argument("program")
     arguments = parser.parse_args(argv)
-    help_text = get_help(arguments.program, arguments.help_command)
+    help_text = get_help(
+        arguments.program,
+        arguments.extra_arguments,
+        arguments.help_command)
     import os
     program = os.path.basename(arguments.program)
     path = os.path.abspath(arguments.program)
@@ -654,7 +669,12 @@ def main(argv):
         path = sh.which(arguments.program)
     #print(help_text)
     if (arguments.json):
-        print(dump_json(program, path, help_text, arguments.pretty_json))
+        print(dump_json(
+            program,
+            arguments.extra_arguments,
+            path,
+            help_text,
+            arguments.pretty_json))
     else:
         for item in parse_help(help_text):
             print(item)

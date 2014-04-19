@@ -906,7 +906,7 @@ Report bugs to <bug-textutils@gnu.org>.
 
 class GetHelp(unittest.TestCase):
     def test_1(self):
-        wrapper.get_help('ls', '--help')
+        wrapper.get_help('ls', [], '--help')
 
 
 class DumpJson(unittest.TestCase):
@@ -932,7 +932,11 @@ usage: git checkout [options] <branch>
     -p, --patch           select hunks interactively
 
 """
-        dump = wrapper.dump_json("git", "/usr/bin/git", git_checkout_help)
+        dump = wrapper.dump_json(
+            "git",
+            ["checkout"],
+            "/usr/bin/git",
+            git_checkout_help)
         import json
         expected_pretty_json = """\
 {
@@ -1029,14 +1033,24 @@ usage: git checkout [options] <branch>
             "control": "break"
         }
     ],
-    "name": "git",
-    "path": "/usr/bin/git"
+    "program": {
+        "arguments": [
+            "checkout"
+        ],
+        "name": "git",
+        "path": "/usr/bin/git"
+    }
 }"""
         expected_json = json.loads(expected_pretty_json)
         assert_equal(expected_json, json.loads(dump))
         assert_equal(
             expected_pretty_json,
-            wrapper.dump_json("git", "/usr/bin/git", git_checkout_help, True))
+            wrapper.dump_json(
+                "git",
+                ["checkout"],
+                "/usr/bin/git",
+                git_checkout_help,
+                True))
 
 #ipdb debugging
 
