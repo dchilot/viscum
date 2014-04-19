@@ -956,8 +956,7 @@ usage: git checkout [options] <branch>
         {
             "checked": false,
             "control": "checkbox",
-            "name": "-q, --quiet",
-            "value": "bug"
+            "name": "-q, --quiet"
         },
         {
             "control": "textarea",
@@ -970,20 +969,17 @@ usage: git checkout [options] <branch>
         {
             "checked": false,
             "control": "checkbox",
-            "name": "-l",
-            "value": "bug"
+            "name": "-l"
         },
         {
             "checked": false,
             "control": "checkbox",
-            "name": "--detach",
-            "value": "bug"
+            "name": "--detach"
         },
         {
             "checked": false,
             "control": "checkbox",
-            "name": "-t, --track",
-            "value": "bug"
+            "name": "-t, --track"
         },
         {
             "control": "textarea",
@@ -992,32 +988,27 @@ usage: git checkout [options] <branch>
         {
             "checked": false,
             "control": "checkbox",
-            "name": "-2, --ours",
-            "value": "bug"
+            "name": "-2, --ours"
         },
         {
             "checked": false,
             "control": "checkbox",
-            "name": "-3, --theirs",
-            "value": "bug"
+            "name": "-3, --theirs"
         },
         {
             "checked": false,
             "control": "checkbox",
-            "name": "-f, --force",
-            "value": "bug"
+            "name": "-f, --force"
         },
         {
             "checked": false,
             "control": "checkbox",
-            "name": "-m, --merge",
-            "value": "bug"
+            "name": "-m, --merge"
         },
         {
             "checked": false,
             "control": "checkbox",
-            "name": "--overwrite-ignore",
-            "value": "bug"
+            "name": "--overwrite-ignore"
         },
         {
             "control": "textarea",
@@ -1026,8 +1017,7 @@ usage: git checkout [options] <branch>
         {
             "checked": false,
             "control": "checkbox",
-            "name": "-p, --patch",
-            "value": "bug"
+            "name": "-p, --patch"
         },
         {
             "control": "break"
@@ -1042,7 +1032,12 @@ usage: git checkout [options] <branch>
     }
 }"""
         expected_json = json.loads(expected_pretty_json)
-        assert_equal(expected_json, json.loads(dump))
+        generated_json = json.loads(dump)
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(expected_json)
+        pp.pprint(generated_json)
+        assert_equal(expected_json, generated_json)
         assert_equal(
             expected_pretty_json,
             wrapper.dump_json(

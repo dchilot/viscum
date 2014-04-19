@@ -177,7 +177,7 @@ class Option(object):
 
     def build(self, form, content):
         if (self._parameter is None):
-            content.append(form.Checkbox(", ".join(self._names), value="bug"))
+            content.append(form.Checkbox(", ".join(self._names)))
             #content.append(form.Radio(", ".join(self._names), ["on", "off"]))
         else:
             content.append(form.Textarea(", ".join(self._names)))
@@ -578,12 +578,11 @@ class JsonForm(object):
         }
         return dico
 
-    def Checkbox(self, name, checked=False, value=""):
+    def Checkbox(self, name, checked=False):
         dico = {
             'control': 'checkbox',
             'name': name,
             'checked': checked,
-            'value': value,
         }
         return dico
 
@@ -591,7 +590,7 @@ class JsonForm(object):
         dico = {
             'control': 'text',
             'content': content,
-            }
+        }
         return dico
 
     def Textarea(self, name):
