@@ -4,15 +4,16 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 
+import abc
 import argparse
 import sys
 import re
+import json
 
 
 from pyparsing import Literal
 from pyparsing import Optional
 from pyparsing import Group
-from pyparsing import Dict
 from pyparsing import Or
 from pyparsing import Regex
 from pyparsing import Word
@@ -39,14 +40,17 @@ gAnything = Regex(".*").suppress()
 gSpace = Literal(" ")
 gSpaces = ZeroOrMore(gSpace).suppress()
 gEOL = Regex("\n").suppress()
+gEOL_keep = Regex("\n")
 gImportantSpaces = ZeroOrMore(gSpace)
 gInnerArgument = Word(alphas, alphanums + '_-').setResultsName("argument")
 gArgument = gSpace + gInnerArgument
 gInnerParameter = Word(alphas, alphanums + '_-')
+gExtendedInnerParameter = Word(alphas, alphanums + '_- ')
 gInnerParameterPlus = Or([gSpace, Literal('=')]).suppress() + gInnerParameter
 gInnerParameterPlusLess = \
     Optional(Or([gSpace, Literal('=')]).suppress()) + gInnerParameter
 gParameter = (Or([
+    Group(gSpace + Literal('<') + gExtendedInnerParameter + Literal('>')),
     Group(Literal('[') + gInnerParameterPlusLess + Literal(']')),
     gInnerParameterPlus + FollowedBy(
         Or([
@@ -88,11 +92,11 @@ gUsage = Group(Or([
     gSpace + gName + gSpaces + gParameters).setResultsName("usage")
 gEmptyLine = gSpaces + gEOL
 gShortText = Optional(
-    Word(srange("[A-Z]") + srange("[a-z]")) + restOfLine) + gEOL
-gText = OneOrMore(gShortText)
-gIntroduction = Optional(
-    Group(Word(srange("[A-Z]") + srange("[a-z]")) + Regex(".*:$"))
-    .setResultsName("introduction"))
+    Word(srange("[A-Z]") + srange("[a-z]")) + restOfLine) + gEOL_keep
+#gText = OneOrMore(gShortText)
+#gIntroduction = Optional(
+    #Group(Word(srange("[A-Z]") + srange("[a-z]")) + Regex(".*:$"))
+    #.setResultsName("introduction"))
 gOptionDescriptionText = \
     Optional(gRepetition + Literal(':')) + \
     OneOrMore(
@@ -112,9 +116,9 @@ gOptionDescriptionSwitch = Or([
     gStdin])
 gOptionDescription = (gOptionDescriptionSwitch + gOptionDescriptionText)\
     .setResultsName("option_description")
-gBidule = gIntroduction + gOptionDescription
-gSubNext = Or([gBidule, gShortText.setResultsName("short_text")])
-gNext = Dict(ZeroOrMore(Group(gSubNext))).setResultsName("next")
+#gBidule = gIntroduction + gOptionDescription
+#gSubNext = Or([gBidule, gShortText.setResultsName("short_text")])
+#gNext = Dict(ZeroOrMore(Group(gSubNext))).setResultsName("next")
 gRest = Regex("(.*\n?)*").setResultsName("rest")
 gHelp = Optional(gEmptyLine) + gUsage + gRest
 
@@ -123,10 +127,15 @@ class Stdin(object):
     def __str__(self):
         return '-'
 
+    def build(self, form, content):
+        content.append(form.Textarea("stdin"))
+
 
 class Option(object):
     def __init__(self, parsed_option):
         self._raw = parsed_option
+        #print('Option')
+        #print('\tself._raw = ' + self._raw)
         self._names = ["".join(parsed_option.first_option)]
         parameters = []
         #if ("other_options" in parsed_option.keys()):
@@ -154,7 +163,7 @@ class Option(object):
             self._description = "".join("".join(parsed_option.description))
             self._description = self._description.replace("\n", " ")
             self._description = self._description.lstrip(" ")
-            #print "self._description = '" + self._description + "'"
+            #print("\tself._description = '" + self._description + "'")
         else:
             self._description = None
 
@@ -168,7 +177,7 @@ class Option(object):
 
     def build(self, form, content):
         if (self._parameter is None):
-            content.append(form.Checkbox(", ".join(self._names), value="bug"))
+            content.append(form.Checkbox(", ".join(self._names)))
             #content.append(form.Radio(", ".join(self._names), ["on", "off"]))
         else:
             content.append(form.Textarea(", ".join(self._names)))
@@ -208,10 +217,22 @@ class Parameter(object):
         return "p " + self._name
 
     def build(self, form, content):
-        pass
+        raise NotImplementedError
 
 
 class BaseGroup(object):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def _left(self):
+        """Left delimiter for the group."""
+        pass
+
+    @abc.abstractmethod
+    def _right(self):
+        """Right delimiter for the group."""
+        pass
+
     def __init__(self, parsed_group):
         self._raw = parsed_group
         self._elements = []
@@ -306,7 +327,8 @@ class EmptyLine(object):
         return "\n"
 
     def build(self, form, content):
-        pass
+        content.append(form.Break())
+        #raise NotImplementedError
 
 
 class Text(object):
@@ -317,7 +339,8 @@ class Text(object):
         return self.text
 
     def build(self, form, content):
-        pass
+        content.append(form.Text(self.text))
+        #raise NotImplementedError
 
 
 class OptionGroup(object):
@@ -331,7 +354,8 @@ class OptionGroup(object):
     def __str__(self):
         result = ""
         if (self.introduction is not None):
-            result += self.introduction + "\n"
+            #result += self.introduction + "\n"
+            result += self.introduction
         for option in self._options:
             result += str(option) + "\n"
         return result
@@ -355,7 +379,7 @@ class SplitFeeder(object):
             finish_index = self._string.find(self._splitter, self._position)
             if (-1 != finish_index):
                 self._position = finish_index + 1
-                yield self._string[start_index:finish_index]
+                yield self._string[start_index:self._position]
             else:
                 self._position = None
                 yield self._string[start_index:]
@@ -367,7 +391,7 @@ class SplitFeeder(object):
             finish_index = self._string.find(self._splitter, self._position)
             if (-1 != finish_index):
                 self._position = finish_index + 1
-                return self._string[start_index:finish_index]
+                return self._string[start_index:self._position]
             else:
                 self._position = None
                 return self._string[start_index:]
@@ -389,37 +413,39 @@ def parse_as_option(string):
 
 
 RE_IS_NOT_OPTION_START = re.compile(
-    """^--?[A-Za-z0-9][-A-Za-z0-9_]*( [-A-Za-z0-9_]+,?)+\..*""")
+    r"""^--?[A-Za-z0-9][-A-Za-z0-9_]*( [-A-Za-z0-9_]+,?)+\..*""")
 RE_IS_OPTION_START = re.compile(
-    """\s*(--?[A-Za-z0-9][-A-Za-z0-9_]*"""
-    """((\[=?[A-Za-z0-9][-A-Za-z0-9_]*])|([= ][A-Za-z0-9][-A-Za-z0-9_]*))?)"""
-    """(, (--?[A-Za-z0-9][-A-Za-z0-9_]*("""
-    """(\[=?[A-Za-z0-9][-A-Za-z0-9_]*])|([= ][A-Za-z0-9][-A-Za-z0-9_]*))?))*"""
-    """(( :? ?.*)|)$""")
-RE_IS_PSEUDO_OPTION_START = re.compile("\s*(-|[a-z]+) +((...)?:)? [A-Za-z].*")
+    r"\s*(--?[A-Za-z0-9][-A-Za-z0-9_]*"
+    r"((\[=?[A-Za-z0-9][-A-Za-z0-9_]*])|([= ][A-Za-z0-9][-A-Za-z0-9_]*))?)"
+    r"(, (--?[A-Za-z0-9][-A-Za-z0-9_]*("
+    r"(\[=?[A-Za-z0-9][-A-Za-z0-9_]*])|([= ][A-Za-z0-9][-A-Za-z0-9_]*))?))*"
+    r"(( :? ?.*)|)$")
+RE_IS_PSEUDO_OPTION_START = re.compile(r"\s*(-|[a-z]+) +((...)?:)? [A-Za-z].*")
 
 
 def is_option_start(line):
     if (line is None):
         return False
     else:
+        line = line.strip('\n')
         return ((RE_IS_NOT_OPTION_START.match(line) is None) and
                 ((RE_IS_OPTION_START.match(line) is not None) or
                     (RE_IS_PSEUDO_OPTION_START.match(line) is not None)))
 
 
 def parse_text(text, feeder, items):
+    #print('parse_text')
     eot = False
     current_line = text
     text = ""
     while (not eot):
-        #print "current_line = '" + str(current_line) + "'"
+        #print("current_line = '" + str(current_line) + "'")
         if (current_line is None):
-            #print "None"
+            #print("None")
             items.append(Text(text))
             eot = True
-        elif (0 == len(current_line)):
-            #print "-Empty-"
+        elif ('\n' == current_line):
+            #print("-Empty-")
             if (0 != len(text)):
                 items.append(Text(text))
             items.append(EmptyLine())
@@ -427,15 +453,16 @@ def parse_text(text, feeder, items):
             parse_start(current_line, feeder, items)
             eot = True
         elif (is_option_start(current_line)):
+            #print("option")
             if (0 != len(text)):
                 items.append(Text(text))
             og = OptionGroup()
             parse_option(current_line, feeder, items, og)
             eot = True
-        elif (current_line.endswith(":")):
-            #print "...:"
-            if ((0 != len(text)) and (not text.endswith(" "))):
-                text += " "
+        elif (current_line.endswith(":\n")):
+            #print("...:")
+            #if ((0 != len(text)) and (not text.endswith(" "))):
+                #text += " "
             text += current_line
             current_line = feeder.next()
             if (is_option_start(current_line)):
@@ -444,14 +471,15 @@ def parse_text(text, feeder, items):
                 parse_option(current_line, feeder, items, og)
                 eot = True
         else:
-            #print "something else"
-            if ((0 != len(text)) and (not text.endswith(" "))):
-                text += " "
+            #print("something else")
+            #if ((0 != len(text)) and (not text.endswith(" "))):
+                #text += " "
             text += current_line
             current_line = feeder.next()
 
 
 def parse_option(option_text, feeder, items, option_group):
+    #print('parse_option')
     can_parse = False
     finished = False
     is_empty = False
@@ -472,10 +500,12 @@ def parse_option(option_text, feeder, items, option_group):
                     finished = True
                     is_empty = True
                     can_parse = True
+                #else:
+                    #option_text += "\n" + current_line
                 else:
-                    option_text += "\n" + current_line
-    #print "option_text"
-    #print option_text
+                    option_text += current_line
+    #print("option_text")
+    #print(option_text)
     parsed_option = gOptionDescription.leaveWhitespace().\
         parseWithTabs().parseString(option_text)
     option_group.add_option(Option(parsed_option))
@@ -488,6 +518,7 @@ def parse_option(option_text, feeder, items, option_group):
 
 
 def parse_start(current_line, feeder, items):
+    #print('parse_start')
     if (current_line is not None):
         if (is_option_start(current_line)):
             parse_option(current_line, feeder, items, OptionGroup())
@@ -517,10 +548,86 @@ def parse_help(input):
     return items
 
 
-def get_help(program, help_command):
+def get_help(program, arguments, help_command):
     import sh
     run = sh.Command(program)
-    return str(run(help_command))
+    args = arguments + [help_command.lstrip(' ')]
+    print("args =", args)
+    return str(run(
+        args,
+        _ok_code=list(range(0, 255))))
+
+
+class JsonForm(object):
+    """Class used to build the json."""
+
+    def __init__(self):
+        pass
+
+    def Radio(self, name, args):
+        dico = {
+            'control': 'radio',
+            'name': name,
+            'args': args,
+        }
+        return dico
+
+    def Break(self):
+        dico = {
+            'control': 'break',
+        }
+        return dico
+
+    def Checkbox(self, name, checked=False):
+        dico = {
+            'control': 'checkbox',
+            'name': name,
+            'checked': checked,
+        }
+        return dico
+
+    def Text(self, content):
+        dico = {
+            'control': 'text',
+            'content': content,
+        }
+        return dico
+
+    def Textarea(self, name):
+        dico = {
+            'control': 'textarea',
+            'name': name,
+        }
+        return dico
+
+    def Textbox(self, name):
+        dico = {
+            'control': 'textbox',
+            'name': name,
+        }
+        return dico
+
+
+def dump_json(name, arguments, path, help_text, pretty=False):
+    json_form = JsonForm()
+    content = []
+    for item in parse_help(help_text):
+        item.build(json_form, content)
+    output = {
+        'program': {
+            'name': name,
+            'arguments': arguments,
+            'path': path,
+        },
+        'content': content,
+    }
+    if (pretty):
+        return json.dumps(
+            output,
+            sort_keys=True,
+            indent=4, separators=(',', ': '))
+    else:
+        return json.dumps(output)
 
 
 def main(argv):
@@ -534,19 +641,43 @@ def main(argv):
         default=False,
         action='store_true')
     parser.add_argument(
+        "--pretty-json",
+        help="Try to make json output pretty.",
+        default=False,
+        action='store_true')
+    parser.add_argument(
+        "-x", "--extra-arguments",
+        help="Extra argument you need to pass to the program.",
+        default=[],
+        action='append')
+    parser.add_argument(
         "-c", "--help-command",
         help="What needs to be given to make the program display help.",
         default="--help")
     parser.add_argument("program")
     arguments = parser.parse_args(argv)
+    help_text = get_help(
+        arguments.program,
+        arguments.extra_arguments,
+        arguments.help_command)
+    import os
+    program = os.path.basename(arguments.program)
+    path = os.path.abspath(arguments.program)
+    if (not os.path.exists(path)):
+        import sh
+        path = sh.which(arguments.program)
+    #print(help_text)
     if (arguments.json):
-        print("json dump requested but not available yet.")
-    help_text = get_help(arguments.program, arguments.help_command)
-    print(help_text)
-    for item in parse_help(help_text):
-        print(item)
+        print(dump_json(
+            program,
+            arguments.extra_arguments,
+            path,
+            help_text,
+            arguments.pretty_json))
+    else:
+        for item in parse_help(help_text):
+            print(item)
 
 
 if ("__main__" == __name__):
-    import sys
-    main(sys.argv[1:])
+    main(sys.argv[1:])  # pragma: no coverage
