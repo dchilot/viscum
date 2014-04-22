@@ -936,7 +936,8 @@ usage: git checkout [options] <branch>
             "git",
             ["checkout"],
             "/usr/bin/git",
-            git_checkout_help)
+            git_checkout_help,
+            False)
         import json
         expected_pretty_json = """\
 {
@@ -1045,6 +1046,7 @@ usage: git checkout [options] <branch>
                 ["checkout"],
                 "/usr/bin/git",
                 git_checkout_help,
+                False,
                 True))
 
 #ipdb debugging

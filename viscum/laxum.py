@@ -535,7 +535,7 @@ def parse_more_help(input, usage):
     return items
 
 
-def parse_help(input):
+def parse_help(input, stdin=False):
     parsed = gHelp.leaveWhitespace().parseWithTabs().parseString(input)
     #print 'parsed ...'
     #import pprint
@@ -545,6 +545,8 @@ def parse_help(input):
     items = [Usage(parsed.usage)]
     #print items[0]
     items += parse_more_help(parsed.rest[1:], parsed.usage)
+    if (stdin):
+        items.append(Stdin())
     return items
 
 
@@ -552,7 +554,7 @@ def get_help(program, arguments, help_command):
     import sh
     run = sh.Command(program)
     args = arguments + [help_command.lstrip(' ')]
-    print("args =", args)
+    #print("args =", args)
     return str(run(
         args,
         _ok_code=list(range(0, 255))))
@@ -608,10 +610,10 @@ class JsonForm(object):
         return dico
 
 
-def dump_json(name, arguments, path, help_text, pretty=False):
+def dump_json(name, arguments, path, help_text, stdin, pretty=False):
     json_form = JsonForm()
     content = []
-    for item in parse_help(help_text):
+    for item in parse_help(help_text, stdin):
         item.build(json_form, content)
     output = {
         'program': {
@@ -646,6 +648,11 @@ def main(argv):
         default=False,
         action='store_true')
     parser.add_argument(
+        "--stdin",
+        help="Generate a control for stdin.",
+        default=False,
+        action='store_true')
+    parser.add_argument(
         "-x", "--extra-arguments",
         help="Extra argument you need to pass to the program.",
         default=[],
@@ -673,9 +680,10 @@ def main(argv):
             arguments.extra_arguments,
             path,
             help_text,
+            arguments.stdin,
             arguments.pretty_json))
     else:
-        for item in parse_help(help_text):
+        for item in parse_help(help_text, arguments.stdin):
             print(item)
 
 
