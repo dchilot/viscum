@@ -234,6 +234,19 @@ on more than one line.""", "".join("".join(parsed_option.description)))
             wrapper.gOptionDescription,
             """  -q, --quiet, --silent     suppress all normal output""")
 
+    def test_11(self):
+        parsed_option = wrapper.parse_with(
+            wrapper.gOptionDescription,
+            """  -e script, --expression=script
+                 add the script to the commands to be executed""")
+        assert_equal("-e", "".join(parsed_option.first_option))
+        assert_equal("--expression", "".join(
+            parsed_option.other_options[0].option))
+        assert_equal("script", parsed_option.parameter)
+        assert_equal(
+            "\nadd the script to the commands to be executed",
+            "".join("".join(parsed_option.description)))
+
 
 class ParseAsName(unittest.TestCase):
     def test_1(self):

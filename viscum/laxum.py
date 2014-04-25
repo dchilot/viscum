@@ -55,7 +55,7 @@ gParameter = (Or([
     gInnerParameterPlus + FollowedBy(
         Or([
             gEOL,
-            gSpace + Literal(','),
+            Optional(gSpace) + Literal(','),
             gSpace + gSpace,
             gSpace + Literal(':')])
     )])).setResultsName("parameter")
@@ -139,20 +139,20 @@ class Option(object):
         self._names = ["".join(parsed_option.first_option)]
         parameters = []
         #if ("other_options" in parsed_option.keys()):
-            #print 'parsed_option["other_options"]'
-            #print parsed_option["other_options"]
+            #print('parsed_option["other_options"]')
+            #print(parsed_option["other_options"])
         if (len(parsed_option.parameter) > 0):
             parameters.append("".join(parsed_option.parameter))
         if (0 != len(parsed_option.other_options)):
-            #print "parsed_option.dump()"
-            #print parsed_option.dump()
+            #print("parsed_option.dump()")
+            #print(parsed_option.dump())
             for other_option in parsed_option.other_options:
-                #print "other_option"
-                #print type(other_option)
-                #print other_option.keys()
+                #print("other_option")
+                #print(type(other_option))
+                #print(other_option.keys())
                 self._names.append("".join(other_option.option))
                 if (len(other_option.parameter) > 0):
-                    #print other_option["parameter"]
+                    #print(other_option["parameter"])
                     parameters.append("".join(other_option.parameter))
         if (len(parameters) > 0):
             # maybe comparing the different values could be interesting
