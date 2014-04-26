@@ -24,7 +24,7 @@ setup(
     tests_require=['nose', 'coverage'],
     entry_points={
         'console_scripts': [
-            'laxum = viscum.laxum:main',
+            'viscum = viscum.main:main',
         ]
     },
 )
