@@ -632,7 +632,7 @@ def dump_json(name, arguments, path, help_text, stdin, pretty=False):
         return json.dumps(output)
 
 
-def main(argv):
+def main(argv=sys.argv[1:]):
     """
     `argv`: command line arguments without the name of the program (poped $0).
     """
@@ -688,4 +688,4 @@ def main(argv):
 
 
 if ("__main__" == __name__):
-    main(sys.argv[1:])  # pragma: no coverage
+    main()  # pragma: no coverage
