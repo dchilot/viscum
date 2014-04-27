@@ -1,0 +1,16 @@
+$def with(tittle, form, stdout, stderr, hide_stdout, hide_stderr)
+
+<!doctype html>
+<html>
+	<head>
+		<title>$tittle</title>
+		<link rel="stylesheet" type="text/css" href="/static/tutorial.css"/>
+	</head>
+	<body>
+		<form method="POST">
+			$:form.render()
+		</form>
+		<textarea id="stdout">$stdout</textarea>
+		<textarea id="stderr">$stderr</textarea>
+	</body>
+</html>

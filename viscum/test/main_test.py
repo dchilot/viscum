@@ -2,7 +2,7 @@ from nose.tools import assert_equal
 from nose.tools import assert_true
 from nose.tools import assert_false
 import unittest
-import viscum.laxum as wrapper
+import viscum.main as wrapper
 
 
 class SplitFeeder(unittest.TestCase):
@@ -973,11 +973,11 @@ usage: git checkout [options] <branch>
             "name": "-q, --quiet"
         },
         {
-            "control": "textarea",
+            "control": "textbox",
             "name": "-b"
         },
         {
-            "control": "textarea",
+            "control": "textbox",
             "name": "-B"
         },
         {
@@ -996,7 +996,7 @@ usage: git checkout [options] <branch>
             "name": "-t, --track"
         },
         {
-            "control": "textarea",
+            "control": "textbox",
             "name": "--orphan"
         },
         {
@@ -1025,7 +1025,7 @@ usage: git checkout [options] <branch>
             "name": "--overwrite-ignore"
         },
         {
-            "control": "textarea",
+            "control": "textbox",
             "name": "--conflict"
         },
         {

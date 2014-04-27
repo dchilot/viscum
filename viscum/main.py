@@ -180,7 +180,12 @@ class Option(object):
             content.append(form.Checkbox(", ".join(self._names)))
             #content.append(form.Radio(", ".join(self._names), ["on", "off"]))
         else:
-            content.append(form.Textarea(", ".join(self._names)))
+            names = ", ".join(self._names)
+            if ("file" in names):
+                content.append(form.Textarea(names))
+            else:
+                content.append(form.Textbox(names))
+            #content.append(form.Textarea(", ".join(self._names)))
 
 
 class Argument(object):

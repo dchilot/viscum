@@ -1,0 +1,86 @@
+{
+    "content": [
+        {
+            "control": "textbox",
+            "name": "SET1"
+        },
+        {
+            "control": "textbox",
+            "name": "SET2"
+        },
+        {
+            "content": "Translate, squeeze, and/or delete characters from standard input,\nwriting to standard output.\n",
+            "control": "text"
+        },
+        {
+            "control": "break"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-c, -C, --complement"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-d, --delete"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-s, --squeeze-repeats"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-t, --truncate-set1"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "--help"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "--version"
+        },
+        {
+            "control": "break"
+        },
+        {
+            "content": "SETs are specified as strings of characters.  Most represent themselves.\nInterpreted sequences are:\n",
+            "control": "text"
+        },
+        {
+            "control": "break"
+        },
+        {
+            "content": "  \\NNN            character with octal value NNN (1 to 3 octal digits)\n  \\\\              backslash\n  \\a              audible BEL\n  \\b              backspace\n  \\f              form feed\n  \\n              new line\n  \\r              return\n  \\t              horizontal tab\n  \\v              vertical tab\n  CHAR1-CHAR2     all characters from CHAR1 to CHAR2 in ascending order\n  [CHAR*]         in SET2, copies of CHAR until length of SET1\n  [CHAR*REPEAT]   REPEAT copies of CHAR, REPEAT octal if starting with 0\n  [:alnum:]       all letters and digits\n  [:alpha:]       all letters\n  [:blank:]       all horizontal whitespace\n  [:cntrl:]       all control characters\n  [:digit:]       all digits\n  [:graph:]       all printable characters, not including space\n  [:lower:]       all lower case letters\n  [:print:]       all printable characters, including space\n  [:punct:]       all punctuation characters\n  [:space:]       all horizontal or vertical whitespace\n  [:upper:]       all upper case letters\n  [:xdigit:]      all hexadecimal digits\n  [=CHAR=]        all characters which are equivalent to CHAR\n",
+            "control": "text"
+        },
+        {
+            "control": "break"
+        },
+        {
+            "content": "Translation occurs if -d is not given and both SET1 and SET2 appear.\n-t may be used only when translating.  SET2 is extended to length of\nSET1 by repeating its last character as necessary.  Excess characters\nof SET2 are ignored.  Only [:lower:] and [:upper:] are guaranteed to\nexpand in ascending order; used in SET2 while translating, they may\nonly be used in pairs to specify case conversion.  -s uses SET1 if not\ntranslating nor deleting; else squeezing uses SET2 and occurs after\ntranslation or deletion.\n",
+            "control": "text"
+        },
+        {
+            "control": "break"
+        },
+        {
+            "content": "Report tr bugs to bug-coreutils@gnu.org\nGNU coreutils home page: <http://www.gnu.org/software/coreutils/>\nGeneral help using GNU software: <http://www.gnu.org/gethelp/>\nFor complete documentation, run: info coreutils 'tr invocation'\n",
+            "control": "text"
+        },
+        {
+            "control": "textarea",
+            "name": "stdin"
+        }
+    ],
+    "program": {
+        "arguments": [],
+        "name": "tr",
+        "path": "/usr/bin/tr"
+    }
+}

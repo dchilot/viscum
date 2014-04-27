@@ -1,0 +1,94 @@
+{
+    "content": [
+        {
+            "control": "textbox",
+            "name": "script-only-if-no-other-script"
+        },
+        {
+            "control": "textarea",
+            "name": "input-file"
+        },
+        {
+            "control": "break"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-n, --quiet, --silent"
+        },
+        {
+            "control": "textbox",
+            "name": "-e, --expression"
+        },
+        {
+            "control": "textarea",
+            "name": "-f, --file"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "--follow-symlinks"
+        },
+        {
+            "control": "textbox",
+            "name": "-i, --in-place"
+        },
+        {
+            "control": "textbox",
+            "name": "-l, --line-length"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "--posix"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-r, --regexp-extended"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-s, --separate"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "-u, --unbuffered"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "--help"
+        },
+        {
+            "checked": false,
+            "control": "checkbox",
+            "name": "--version"
+        },
+        {
+            "control": "break"
+        },
+        {
+            "content": "If no -e, --expression, -f, or --file option is given, then the first\nnon-option argument is taken as the sed script to interpret.  All\nremaining arguments are names of input files; if no input files are\nspecified, then the standard input is read.\n",
+            "control": "text"
+        },
+        {
+            "control": "break"
+        },
+        {
+            "content": "GNU sed home page: <http://www.gnu.org/software/sed/>.\nGeneral help using GNU software: <http://www.gnu.org/gethelp/>.\nE-mail bug reports to: <bug-gnu-utils@gnu.org>.\nBe sure to include the word ``sed'' somewhere in the ``Subject:'' field.\n",
+            "control": "text"
+        },
+        {
+            "control": "textarea",
+            "name": "stdin"
+        }
+    ],
+    "program": {
+        "arguments": [],
+        "name": "sed",
+        "path": "/bin/sed"
+    }
+}
